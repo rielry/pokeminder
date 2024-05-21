@@ -1,4 +1,4 @@
-import jsdom from "jsdom";
+import { getDocumentFromUrl } from "./utils.js";
 
 const config = {
   strings: {
@@ -39,7 +39,7 @@ const today = new Date();
 const currentMonth = today.getMonth() - 1;
 
 export const getUpcomingCommunityDays = async () => {
-  const document = (await jsdom.JSDOM.fromURL(config.url)).window.document;
+  const document =  await getDocumentFromUrl(config.url);
   const blogPosts = Array.from(
     document.getElementsByClassName(config.classNames.blogPosts)[0].childNodes
   ).filter((d) => d.hasChildNodes());
@@ -75,7 +75,7 @@ const parseBlogPost = async (post) => {
 };
 
 const getDateAndTime = async (url) => {
-  const document = (await jsdom.JSDOM.fromURL(url)).window.document;
+  const document = await getDocumentFromUrl(url);
   return document.getElementsByClassName(config.classNames.post.body)[0]
     .firstChild.innerHTML;
 };

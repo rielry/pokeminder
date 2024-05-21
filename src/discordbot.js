@@ -17,6 +17,14 @@ client.login(process.env.CLIENT_TOKEN);
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  const guilds = client.guilds.cache;
+  const keys = guilds.keys();
+
+  for (const key of keys) {
+    const guild = guilds.get(key);
+    const channel = guild.channels.cache.find((d) => d.name === "general");
+    channel.send({ content: "Bot online" });
+  }
 
   schedule.scheduleJob("30 9 * * *", async () => {
     sendCommunityDayReminder();

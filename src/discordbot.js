@@ -3,7 +3,7 @@ import { Client, IntentsBitField } from "discord.js";
 import schedule from "node-schedule";
 import { getUpcomingCommunityDays } from "./community-days.js";
 
-dotenv.config;
+dotenv.config();
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const today = new Date();
@@ -23,7 +23,7 @@ client.on("ready", async () => {
   for (const key of keys) {
     const guild = guilds.get(key);
     const channel = guild.channels.cache.find((d) => d.name === "general");
-    channel.send({ content: "Bot online" });
+    channel.send({ content: "online" });
   }
 
   schedule.scheduleJob("30 9 * * *", async () => {

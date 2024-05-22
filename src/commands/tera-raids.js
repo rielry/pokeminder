@@ -1,24 +1,26 @@
 import { SlashCommandBuilder } from "discord.js";
-import { fetchMysteryGifts } from "../violetScarletEvents.js"; 
-import commands from "./utility/commands.js";
+import { fetchTeraRaids } from "../violetScarletEvents.js";
+import { botConfig as config } from "../config.js";
 
-const metadata = commands.find(d => d.name === "tera-raids");
+const command = config.slashCommands.teraRaids;
 
 export default {
-	data: new SlashCommandBuilder()
-		.setName(metadata.name)
-		.setDescription(metadata.description),
-	async execute(interaction) {
-		const gifts = await fetchMysteryGifts();
-  
-		const formatted = gifts.map((d) => {
-		  return `- **${d.gift}** - expires ${
-			d.expires?.toLocaleDateString() || "N/A"
-		  }\n  ${d.code}`;
-		});
-	  
-		interaction.reply(
-		  `Here is a list of all unexpired gift codes.\n${formatted.join("\n")}`
-		);
-	},
+  data: new SlashCommandBuilder()
+    .setName(command.name)
+    .setDescription(command.description),
+  async execute(interaction) {
+    const raids = await fetchTeraRaids();
+
+    if (raids.length === 0) {
+      interaction.reply("There are no upcoming raids at this time :(");
+    } else {
+      const formatted = raids.map((raid) => {
+        return `- **${raid.title}** (${raid.start.toLocaleDateString()} - ${raid.end.toLocaleDateString()})`;
+      });
+
+      interaction.reply(
+        `Here are the upcoming raids!\n${formatted.join("\n")}`
+      );
+    }
+  },
 };

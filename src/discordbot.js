@@ -12,6 +12,7 @@ import { getUpcomingCommunityDays } from "./communityDays.js";
 import { fetchMysteryGifts, fetchTeraRaids } from "./violetScarletEvents.js";
 import { isNearingExpire, botMentioned } from "./utils.js";
 import giftCodes from "./commands/gift-codes.js";
+import teraRaids from "./commands/tera-raids.js";
 import {botConfig as config} from "./config.js";
 
 dotenv.config();
@@ -24,7 +25,8 @@ const client = new Client({
 });
 
 client.commands = new Collection();
-client.commands.set(config.slashCommands.giftCodes, giftCodes);
+client.commands.set(config.slashCommands.giftCodes.name, giftCodes);
+client.commands.set(config.slashCommands.teraRaids.name, teraRaids);
 
 client.login(process.env.CLIENT_TOKEN);
 

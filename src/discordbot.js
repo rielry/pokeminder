@@ -8,7 +8,7 @@ import {
   Events
 } from "discord.js";
 import schedule from "node-schedule";
-import { getUpcomingCommunityDays } from "./community-days.js";
+import { getUpcomingCommunityDays } from "./communityDays.js";
 import { fetchMysteryGifts, fetchTeraRaids } from "./violetScarletEvents.js";
 import { isNearingExpire, botMentioned } from "./utils.js";
 import giftCodes from "./commands/gift-codes.js";

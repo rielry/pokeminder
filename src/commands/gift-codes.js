@@ -30,7 +30,6 @@ export default {
       }
     } catch (e) {
       console.error(e);
-    } finally {
       interaction.editReply("Error occurred, try again later :(");
     }
   },

@@ -10,14 +10,12 @@ import {
 import schedule from "node-schedule";
 import { getUpcomingCommunityDays } from "./communityDays.js";
 import { fetchMysteryGifts, fetchTeraRaids } from "./violetScarletEvents.js";
-import { isNearingExpire, botMentioned } from "./utils.js";
+import { isNearingExpire } from "./utils.js";
 import giftCodes from "./commands/gift-codes.js";
 import teraRaids from "./commands/tera-raids.js";
 import {botConfig as config} from "./config.js";
 
 dotenv.config();
-
-const today = new Date("2025-02-25 00:00:00");
 
 const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -40,16 +38,6 @@ client.on("ready", async () => {
   });
 });
 
-client.on("messageCreate", (message) => {
-  if (
-    botMentioned(message, client) &&
-    message.content
-      .toLocaleLowerCase()
-      .includes(config.slashCommands.listMysteryGifts)
-  ) {
-    sendUnexpiredGiftCodes(message);
-  }
-});
 
 client.on(Events.InteractionCreate, (interaction) => {
   if (interaction.isChatInputCommand()) {

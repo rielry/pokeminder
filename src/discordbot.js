@@ -8,7 +8,8 @@ dotenv.config();
 
 const config = {
   links: {
-    officialVioletScarletEvents: "https://scarletviolet.pokemon.com/en-us/events/"
+    officialVioletScarletEvents: "https://scarletviolet.pokemon.com/en-us/events/",
+    howToClaimGift: "https://www.nintendo.com/au/support/articles/how-to-receive-a-mystery-gift-pokemon-scarlet-pokemon-violet/"
   },
   colors: {
     teraRaid: "#a1ff4a",
@@ -21,10 +22,16 @@ const config = {
   time: {
     day: 24 * 60 * 60 * 1000,
     giftExpireReminderTime: 3
+  },
+  images: {
+    mysteryGift: "https://www.dexerto.com/cdn-cgi/image/width=3840,quality=60,format=auto/https://editors.dexerto.com/wp-content/uploads/2022/08/17/pokemon-scarlet-violet-mystery-gift-header.jpg"
+  },
+  commands: {
+    listMysteryGifts: "gift codes"
   }
 }
 
-const today = new Date("2024-05-18 00:00:00");
+const today = new Date("2025-02-25 00:00:00");
 
 const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
@@ -35,14 +42,34 @@ client.login(process.env.CLIENT_TOKEN);
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  // sendExpiringGiftCodeReminder();
-  sendCommunityDayReminder();
 
   schedule.scheduleJob("30 9 * * *", async () => {
+    sendCommunityDayReminder();
     sendTeraRaidNotification();
+    sendExpiringGiftCodeReminder();
   });
 });
 
+client.on("messageCreate", (message) => {
+  if(botMentioned(message) && message.content.toLocaleLowerCase().includes(config.commands.listMysteryGifts)) {
+
+    sendUnexpiredGiftCodes(message);
+  }
+});
+
+const botMentioned = (message) => {
+  return Array.from(message.mentions.users.keys()).includes(client.user.id);
+}
+
+const sendUnexpiredGiftCodes = async (message) => {
+  const gifts = await fetchMysteryGifts();
+
+  const formatted = gifts.map(d => {
+    return `- **${d.gift}** - expires ${d.expires?.toLocaleDateString() || "N/A"}\n  ${d.code}`
+  });
+
+  message.reply(`Hey <@${message.author.id}>, here is a list of all unexpired gift codes!\n${formatted.join("\n")}`)
+}
 
 const sendCommunityDayReminder = async () => {
   const communityDays = await getUpcomingCommunityDays();
@@ -85,8 +112,20 @@ const sendExpiringGiftCodeReminder = async () => {
 
   const timeFrame = config.time.giftExpireReminderTime * config.time.day;
 
-  const expires = giftCodes.find(codes => codes.expires && isNearingExpire(timeFrame, codes.expires));
-  console.log(expires)
+  const expiresSoon = giftCodes.find(codes => codes.expires && isNearingExpire(timeFrame, codes.expires));
+
+  if(expiresSoon) {
+    const embed = new EmbedBuilder()
+      .setTitle(`Expiring soon! Mystery Gift: ${expiresSoon.gift}`)
+      .setDescription(`Claim using code: ${expiresSoon.code}`)
+      .addFields(
+        {name: "Expires on", value: expiresSoon.expires.toLocaleDateString()}
+      )
+      .setImage(config.images.mysteryGift)
+      .setColor(config.colors.mysteryGiftExpire);
+
+      sendEmbedToChannel(config.channelNames.general, embed);
+  }
 }
 
 const isNearingExpire = (expireTimeFrame, expireTime) => {

@@ -11,18 +11,26 @@ export default {
   async execute(interaction) {
     interaction.deferReply();
 
-    const raids = await fetchTeraRaids();
+    try {
+      const raids = await fetchTeraRaids();
 
-    if (raids.length === 0) {
-      interaction.editReply("There are no upcoming raids at this time :(");
-    } else {
-      const formatted = raids.map((raid) => {
-        return `- **${raid.title}** (${raid.start.toLocaleDateString()} - ${raid.end.toLocaleDateString()})`;
-      });
+      if (raids.length === 0) {
+        interaction.editReply("There are no upcoming raids at this time :(");
+      } else {
+        const formatted = raids.map((raid) => {
+          return `- **${
+            raid.title
+          }** (${raid.start.toLocaleDateString()} - ${raid.end.toLocaleDateString()})`;
+        });
 
-      interaction.editReply(
-        `Here are the upcoming raids!\n${formatted.join("\n")}`
-      );
+        interaction.editReply(
+          `Here are the upcoming raids!\n${formatted.join("\n")}`
+        );
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      interaction.editReply("Error occurred, try again later :(");
     }
   },
 };

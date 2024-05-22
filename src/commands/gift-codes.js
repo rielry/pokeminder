@@ -11,20 +11,26 @@ export default {
   async execute(interaction) {
     interaction.deferReply();
 
-    const gifts = await fetchMysteryGifts();
+    try {
+      const gifts = await fetchMysteryGifts();
 
-    if (gifts.length === 0) {
-      interaction.editReply("There are no gifts codes at this time :(");
-    } else {
-      const formatted = gifts.map((d) => {
-        return `- **${d.gift}** - expires ${
-          d.expires?.toLocaleDateString() || "N/A"
-        }\n  ${d.code}`;
-      });
+      if (gifts.length === 0) {
+        interaction.editReply("There are no gifts codes at this time :(");
+      } else {
+        const formatted = gifts.map((d) => {
+          return `- **${d.gift}** - expires ${
+            d.expires?.toLocaleDateString() || "N/A"
+          }\n  ${d.code}`;
+        });
 
-      interaction.editReply(
-        `Here is a list of all unexpired gift codes.\n${formatted.join("\n")}`
-      );
+        interaction.editReply(
+          `Here is a list of all unexpired gift codes.\n${formatted.join("\n")}`
+        );
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      interaction.editReply("Error occurred, try again later :(");
     }
   },
 };

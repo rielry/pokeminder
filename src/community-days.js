@@ -1,4 +1,4 @@
-import jsdom from "jsdom";
+import { getDocumentFromUrl } from "./utils.js";
 
 const config = {
   strings: {
@@ -24,6 +24,7 @@ const config = {
   },
   classNames: {
     blogPosts: "blogList__posts",
+    blogPost: "blogPost__post",
     blogPostContent: "blogList__post__content",
     postDate: "blogList__post__content__date",
     postTitle: "blogList__post__content__title",
@@ -39,7 +40,7 @@ const today = new Date();
 const currentMonth = today.getMonth() - 1;
 
 export const getUpcomingCommunityDays = async () => {
-  const document = (await jsdom.JSDOM.fromURL(config.url)).window.document;
+  const document =  await getDocumentFromUrl(config.url);
   const blogPosts = Array.from(
     document.getElementsByClassName(config.classNames.blogPosts)[0].childNodes
   ).filter((d) => d.hasChildNodes());
@@ -61,21 +62,28 @@ const parseBlogPost = async (post) => {
 
   if (isUpcoming && title.toLowerCase().includes(config.strings.communityDay)) {
     const pokemon = titleTokens[titleTokens.length - 1].trim();
-    const dateAndTime = await getDateAndTime(post.href);
-    const date = new Date(dateAndTime.match(/[a-zA-Z]+ [0-9]{1,2}, [0-9]{4}/));
+    const blogPostInfo = await getInfoFromBlogPost(post.href);
+    const date = new Date(blogPostInfo.dateAndTime.match(/[a-zA-Z]+ [0-9]{1,2}, [0-9]{4}/));
 
     return {
       date: date,
-      dateAndTime: dateAndTime,
+      dateAndTime: blogPostInfo.dateAndTime,
       title: title,
       pokemon: pokemon,
       url: post.href,
+      image: blogPostInfo.image
     };
   }
 };
 
-const getDateAndTime = async (url) => {
-  const document = (await jsdom.JSDOM.fromURL(url)).window.document;
-  return document.getElementsByClassName(config.classNames.post.body)[0]
-    .firstChild.innerHTML;
+const getInfoFromBlogPost = async (url) => {
+  const document = await getDocumentFromUrl(url);
+
+  const image = document.getElementsByClassName(config.classNames.blogPost)[0].querySelector("img").src
+  const dateAndTime = document.getElementsByClassName(config.classNames.post.body)[0].textContent;
+  
+  return {
+    dateAndTime: dateAndTime,
+    image: image
+  }
 };

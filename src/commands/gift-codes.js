@@ -9,10 +9,12 @@ export default {
     .setName(command.name)
     .setDescription(command.description),
   async execute(interaction) {
+    interaction.deferReply();
+
     const gifts = await fetchMysteryGifts();
 
     if (gifts.length === 0) {
-      interaction.reply("There are no gifts codes at this time :(");
+      interaction.editReply("There are no gifts codes at this time :(");
     } else {
       const formatted = gifts.map((d) => {
         return `- **${d.gift}** - expires ${
@@ -20,7 +22,7 @@ export default {
         }\n  ${d.code}`;
       });
 
-      interaction.reply(
+      interaction.editReply(
         `Here is a list of all unexpired gift codes.\n${formatted.join("\n")}`
       );
     }

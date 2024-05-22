@@ -6,7 +6,6 @@ dotenv.config();
 
 const rest = new REST().setToken(process.env.CLIENT_TOKEN);
 const clientId = process.env.CLIENT_ID;
-const serverId = process.env.SERVER_ID;
 
 (async () => {
 	try {
@@ -14,7 +13,7 @@ const serverId = process.env.SERVER_ID;
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			Routes.applicationGuildCommands(clientId, serverId),
+			Routes.applicationCommands(clientId),
 			{ body: commands },
 		);
 

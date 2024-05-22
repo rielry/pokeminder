@@ -10,7 +10,7 @@ export default {
     .setDescription(command.description),
   async execute(interaction) {
     console.log(`Received request for ${command.name}`);
-    interaction.deferReply();
+    await interaction.deferReply();
 
     try {
       const raids = await fetchTeraRaids();

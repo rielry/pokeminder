@@ -5,44 +5,16 @@ import {
   EmbedBuilder,
   Partials,
   Collection,
-  Events,
-  REST
+  Events
 } from "discord.js";
 import schedule from "node-schedule";
 import { getUpcomingCommunityDays } from "./community-days.js";
 import { fetchMysteryGifts, fetchTeraRaids } from "./violetScarletEvents.js";
 import { isNearingExpire, botMentioned } from "./utils.js";
 import giftCodes from "./commands/gift-codes.js";
+import {botConfig as config} from "./config.js";
 
 dotenv.config();
-
-const config = {
-  links: {
-    officialVioletScarletEvents:
-      "https://scarletviolet.pokemon.com/en-us/events/",
-    howToClaimGift:
-      "https://www.nintendo.com/au/support/articles/how-to-receive-a-mystery-gift-pokemon-scarlet-pokemon-violet/",
-  },
-  colors: {
-    teraRaid: "#a1ff4a",
-    mysteryGiftExpire: "#ff4dd2",
-    communityDay: "#806dfc",
-  },
-  channelNames: {
-    general: "general",
-  },
-  time: {
-    day: 24 * 60 * 60 * 1000,
-    giftExpireReminderTime: 3,
-  },
-  images: {
-    mysteryGift:
-      "https://www.dexerto.com/cdn-cgi/image/width=3840,quality=60,format=auto/https://editors.dexerto.com/wp-content/uploads/2022/08/17/pokemon-scarlet-violet-mystery-gift-header.jpg",
-  },
-  commands: {
-    listMysteryGifts: "gift codes",
-  },
-};
 
 const today = new Date("2025-02-25 00:00:00");
 
@@ -52,7 +24,7 @@ const client = new Client({
 });
 
 client.commands = new Collection();
-client.commands.set("gift-codes", giftCodes);
+client.commands.set(config.slashCommands.giftCodes, giftCodes);
 
 client.login(process.env.CLIENT_TOKEN);
 
@@ -71,7 +43,7 @@ client.on("messageCreate", (message) => {
     botMentioned(message, client) &&
     message.content
       .toLocaleLowerCase()
-      .includes(config.commands.listMysteryGifts)
+      .includes(config.slashCommands.listMysteryGifts)
   ) {
     sendUnexpiredGiftCodes(message);
   }
